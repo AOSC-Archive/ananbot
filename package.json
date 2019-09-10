@@ -1,0 +1,27 @@
+{
+  "name": "saki-telebot-api",
+  "version": "1.0.1",
+  "main": "index.js",
+  "author": "eatradish <sakiiily@aosc.io>",
+  "license": "MIT",
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/cheerio": "^0.22.13",
+    "@types/node": "^12.7.1",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
+    "axios": "^0.19.0",
+    "axios-retry": "^3.1.2",
+    "cheerio": "^1.0.0-rc.3",
+    "colors": "^1.3.3",
+    "eslint": "^6.1.0",
+    "ts-node-dev": "^1.0.0-pre.40",
+    "typescript": "^3.5.3"
+  },
+  "scripts": {
+    "start_paren": "ts-node-dev --respawn --transpileOnly example/paren.ts",
+    "start_botClient": "ts-node-dev --respawn --transpileOnly example/botClient.ts",
+    "start_treehole": "ts-node-dev --respawn --transpileOnly example/treehole.ts",
+    "build": "tsc"
+  }
+}
