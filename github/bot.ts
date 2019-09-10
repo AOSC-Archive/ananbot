@@ -3,13 +3,13 @@ import Axios, { AxiosInstance } from 'axios';
 import * as GithubInterface from './GithubInterface';
 import axiosRetry from 'axios-retry';
 
-function readLoginInfo(): GithubInterface.LoginRequest {
-    const file = Fs.readFileSync('./login.json', 'utf8');
+export function readLoginInfo(path = './login.json'): GithubInterface.LoginRequest {
+    const file = Fs.readFileSync(path, 'utf8');
     if (file) return JSON.parse(file) as GithubInterface.LoginRequest;
     else throw new Error('File not exist');
 }
 
-class GithubBot {
+export class GithubBot {
     private requester: AxiosInstance;
     public constructor(login: GithubInterface.LoginRequest) {
         this.requester = Axios.create({
@@ -30,25 +30,18 @@ class GithubBot {
         if (res.status === 200 && res.data) return res.data;
         else throw new Error('GET close issue failed');
     }
-    public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest) {
+    public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest): Promise<GithubInterface.IssueResponse> {
         const json = JSON.stringify(issue);
-        const res = await this.requester.post('/repos/eatradish/saki-telebot-api/issues', json);
+        const res = await this.requester.post('/repos/aosc-dev/aosc-os-abbs/issues', json);
         if (res.status === 201 && res.data) return res.data;
         else throw new Error('POST open new issue failed');
     }
 }
 
-const main = async () => {
-    const bot = new GithubBot(readLoginInfo());
-    //console.log(await bot.getInfo());
-    //onsole.log((await bot.getCloseIssue()));
-    console.log(await bot.openNewIssue({
-        title: "qaq",
-        body: "I'm having a problem with this.",
-    }));
+const createGithubBot = (): GithubBot => {
+    return new GithubBot(readLoginInfo());
 }
 
-main();
-
+export default createGithubBot;
 
 
