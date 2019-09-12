@@ -11,18 +11,42 @@ export function readLoginInfo(path = './login.json'): GithubInterface.LoginReque
 
 export class GithubBot {
     private requester: AxiosInstance;
-    private owner: string;
-    private repo: string;
+    public owner: string;
+    public repo: string;
+    private repoURL: string;
     private issueURL: string;
-    public constructor(login: GithubInterface.LoginRequest, owner: string, repo: string) {
-        this.requester = Axios.create({
+    public labelList: string[];
+    private constructor(obj: GithubInterface.OpenNewGithubBot) {
+        this.requester = obj.requester;
+        this.owner = obj.owner;
+        this.repo = obj.repo;
+        this.repoURL = obj.repoURL;
+        this.labelList = obj.labelList;
+        this.issueURL = `${this.repoURL}/issues`;
+    }
+    public static async createGithubBot(login: GithubInterface.LoginRequest, owner: string, repo: string): 
+    Promise<GithubBot> {
+        const requester = Axios.create({
             baseURL: "https://api.github.com",
             auth: login,
         });
-        this.owner = owner;
-        this.repo = repo;
-        this.issueURL = `/repos/${owner}/${repo}/issues`;
-        axiosRetry(this.requester, { retries: 3 });
+        const repoURL = `/repos/${owner}/${repo}`;
+        const labelList = await GithubBot.getRepoLabels(requester, repoURL);
+        const obj = {
+            requester, owner, repo, repoURL, labelList
+        }
+        return new GithubBot(obj);
+    }
+    public static async getRepoLabels(requester: AxiosInstance, repoURL: string): Promise<string[]> {
+        const res: string[] = [];
+        requester.get(`${repoURL}/labels`).catch((err) => console.log(err));
+        const resp = await requester.get(`${repoURL}/labels`);
+        if (resp.status !== 200 || resp.data === undefined) throw new Error('GET labels failed');
+        const list = resp.data as GithubInterface.IssueLabel[];
+        for (const index of list) {
+            res.push(index.name);
+        }
+        return res;
     }
     public async getInfo(): Promise<GithubInterface.LoginResponse> {
         const res = await this.requester.get('');
@@ -51,10 +75,10 @@ export class GithubBot {
     }
 }
 
-const createGithubBot = (): GithubBot => {
-    return new GithubBot(readLoginInfo(), 'aosc-dev', 'aosc-os-abbs');
+const create = async (): Promise<GithubBot> => {
+    return await GithubBot.createGithubBot(readLoginInfo(), 'aosc-dev', 'aosc-os-abbs');
 }
 
-export default createGithubBot;
+export default create;
 
 

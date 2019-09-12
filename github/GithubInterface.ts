@@ -1,3 +1,5 @@
+import { AxiosInstance } from 'axios';
+
 export interface LoginRequest {
     username: string;
     password: string;
@@ -99,4 +101,12 @@ export interface OpenNewIssueRequest {
     milestone?: number;
     labels?: string[];
     assignees?: string[];
+}
+
+export interface OpenNewGithubBot {
+    requester: AxiosInstance;
+    owner: string;
+    repo: string;
+    repoURL: string;
+    labelList: string[];
 }

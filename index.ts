@@ -12,15 +12,19 @@ const createTelegramBot = (): TelegramBot => {
     return telegramBot;
 }
 
-const githubBot = GithubBot();
-const teleramBot = createTelegramBot();
+const main = async () => {
+    const githubBot = await GithubBot();
+    const teleramBot = createTelegramBot();
 
-teleramBot.on('/hello', (msg: Messages.default) => msg.replyText('Hello'));
-teleramBot.on(/^\/openissue (.+)$/, (msg: Messages.default, props: string[]) => {
-    if (!msg.obj.reply_to_message || !msg.obj.message || !msg.obj.message.text) return;
-    const title = props[1];
-    const body = msg.obj.message.text;
-    const issue = { title, body };
-    githubBot.openNewIssue(issue);
-});
-teleramBot.listen();
+    teleramBot.on('/hello', (msg: Messages.default) => msg.replyText('Hello'));
+    teleramBot.on(/^\/openissue (.+)$/, (msg: Messages.default, props: string[]) => {
+        if (!msg.obj.reply_to_message || !msg.obj.message || !msg.obj.message.text) return;
+        const title = props[1];
+        const body = msg.obj.message.text;
+        const issue = { title, body };
+        githubBot.openNewIssue(issue);
+    });
+    teleramBot.listen();
+}
+
+main();
