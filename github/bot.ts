@@ -16,6 +16,7 @@ export class GithubBot {
     private repoURL: string;
     private issueURL: string;
     public labelList: string[];
+
     private constructor(obj: GithubInterface.OpenNewGithubBot) {
         this.requester = obj.requester;
         this.owner = obj.owner;
@@ -23,7 +24,9 @@ export class GithubBot {
         this.repoURL = obj.repoURL;
         this.labelList = obj.labelList;
         this.issueURL = `${this.repoURL}/issues`;
+        axiosRetry(this.requester, { retries: 3 });
     }
+
     public static async createGithubBot(login: GithubInterface.LoginRequest, owner: string, repo: string): 
     Promise<GithubBot> {
         const requester = Axios.create({
@@ -37,22 +40,34 @@ export class GithubBot {
         }
         return new GithubBot(obj);
     }
+
     public static async getRepoLabels(requester: AxiosInstance, repoURL: string): Promise<string[]> {
-        const res: string[] = [];
-        requester.get(`${repoURL}/labels`).catch((err) => console.log(err));
         const resp = await requester.get(`${repoURL}/labels`);
         if (resp.status !== 200 || resp.data === undefined) throw new Error('GET labels failed');
-        const list = resp.data as GithubInterface.IssueLabel[];
+        return GithubBot.getLabelListByIssue(resp.data);
+    }
+
+    public static getLabelListByIssue(issue: GithubInterface.IssueResponse): string[] {
+        const res: string[] = [];
+        const list = issue.label as GithubInterface.IssueLabel[];
         for (const index of list) {
             res.push(index.name);
         }
         return res;
     }
+
     public async getInfo(): Promise<GithubInterface.LoginResponse> {
         const res = await this.requester.get('');
         if (res.status === 200 && res.data) return res.data;
         else throw new Error('GET info failed');
     }
+
+    public async getIssueByNumber(issueNumber: number): Promise<GithubInterface.IssueResponse> {
+        const resp = await this.requester.get(`${this.issueURL}/${issueNumber}`);
+        if (resp.status === 200 && resp.data) return resp.data;
+        else throw new Error(`GET issue ${issueNumber} failed`);
+    }
+
     public async getCloseIssue(): Promise<GithubInterface.IssueResponse> {
         const res = await this.requester.get(this.issueURL, { 
             params: { state: 'closed' },
@@ -60,15 +75,18 @@ export class GithubBot {
         if (res.status === 200 && res.data) return res.data;
         else throw new Error('GET close issue failed');
     }
-    public getIssueNUmber(issue: GithubInterface.IssueResponse) {
+
+    public getIssueNumber(issue: GithubInterface.IssueResponse): number {
         return issue.number;
     }
+
     public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest): Promise<GithubInterface.IssueResponse> {
         const json = JSON.stringify(issue);
         const res = await this.requester.post(this.issueURL, json);
         if (res.status === 201 && res.data) return res.data;
         else throw new Error('POST open new issue failed');
     }
+
     public async closeIssue(issueNumber: number): Promise<GithubInterface.IssueResponse> {
         const patch = { state: 'closed' };
         const json = JSON.stringify(patch);
@@ -76,6 +94,18 @@ export class GithubBot {
         if (res.status === 200 && res.data) return res.data;
         else throw new Error(`PATCH close ${issueNumber} failed`);
     }
+
+    public async addLabelByIssue(issueNumber: number, label: string): Promise<GithubInterface.IssueResponse> {
+        if (this.labelList.indexOf(label) === -1) throw new Error('label not exist');
+        const issue = await this.getIssueByNumber(issueNumber);
+        const issueLabelList = GithubBot.getLabelListByIssue(issue);
+        if (issueLabelList.indexOf(label) === -1) issueLabelList.push(label);
+        else throw new Error('label exist');
+        const json = JSON.stringify({ labels: issueLabelList });
+        const resp = await this.requester.patch(this.issueURL, json);
+        if (resp.status === 200 && resp.data) return resp.data;
+        else throw new Error('PATCH addIabelByIssue failed');
+    }   
 }
 
 const create = async (): Promise<GithubBot> => {
