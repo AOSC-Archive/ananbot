@@ -48,7 +48,6 @@ export interface BotGetUpdatesResult {
     message?: BotGetUpdatesResultMessage;
     channel_post?: BotGetUpdatesResultChannelPost;
     edited_message?: BotGetUpdatesResultEditedMessage;
-    reply_to_message?: BotGetUpdatesResultReplyToMessage;
 }
 
 export interface BotGetUpdatesResultEditedMessage {
@@ -69,6 +68,7 @@ export interface BotGetUpdatesResultMessage {
     photo?: BotGetUpdatesResultMessagePhoto[];
     sticker?: BotGetUpdatesResultMessageSticker;
     caption?: string;
+    reply_to_message?: BotGetUpdatesResultMessageReplyToMessage;
 }
 
 export interface BotGetUpdatesResultMessageSticker {
@@ -140,7 +140,7 @@ export interface BotGetMe {
     };
 }
 
-export interface BotGetUpdatesResultReplyToMessage {
+export interface BotGetUpdatesResultMessageReplyToMessage {
     message_id: number;
     from: BotGetUpdatesResultMessageFrom;
     chat: BotGetUpdatesResultMessageChat;

@@ -87,13 +87,14 @@ export default class Bot {
                     const match = e.exec(text);
                     if (match) {
                         const input = match[0];
-                        props.push(input.split('')[0])
-                        props.push(input.split('').slice(1).slice(1).join(''));
+                        props.push(input.split(' ')[0]);
+                        props.push(input.split(' ').slice(1).join(' '));
                         funcMatchIndexList.push(i);
                     }
                 }
                 else if (isString(e) && text && text.indexOf(e) !== -1) {
-                    props = [text];
+                    props.push(text.split(' ')[0]);
+                    props.push(text.split(' ').slice(1).join(' '));
                     funcMatchIndexList.push(i);
                 }
                 else if (isString(e) && text && e === 'text') {

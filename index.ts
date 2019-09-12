@@ -12,22 +12,26 @@ const createTelegramBot = (): TelegramBot => {
     return telegramBot;
 }
 
-const main = async () => {
+const main = async (): Promise<void> => {
     const githubBot = await GithubBot();
     const teleramBot = createTelegramBot();
 
     teleramBot.on('/hello', (msg: Messages.default) => msg.replyText('Hello'));
-    teleramBot.on(/^\/openissue (.+)$/, async (msg: Messages.default, props: string[]) => {
-        if (!msg.obj.reply_to_message || !msg.obj.message || !msg.obj.message.text) return;
+    teleramBot.on('/openissue', async (msg: Messages.default, props: string[]) => {
+        if ((msg.obj.message && !msg.obj.message.reply_to_message) || !msg.obj.message || !msg.obj.message.text) {
+            msg.replyText('Use: Reply some message /openissue + title');
+            return;
+        }
+        if (!msg.obj.message.reply_to_message) return;
         const title = props[1];
-        const body = msg.obj.message.text;
+        const body = msg.obj.message.reply_to_message.text;
         const issue = { title, body };
         const res = await githubBot.openNewIssue(issue);
         if (res) msg.replyText(`Open issue success, issue number: ${res.number}`);
     });
 
-    teleramBot.on(/^\/closeissue (.+)$/, async (msg: Messages.default, props: string[]) => {
-        let issue: number = -1;
+    teleramBot.on('/closeissue', async (msg: Messages.default, props: string[]) => {
+        let issue= -1;
         if (Number(props[1]) !== NaN) {
             issue = Number(props[1])
         }

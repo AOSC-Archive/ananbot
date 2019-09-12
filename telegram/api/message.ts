@@ -17,8 +17,7 @@ export default class Message {
         return await this.bot.sendMessage(chatId, text);
     }
     public getMessageType(): string {
-        if (this.obj.reply_to_message) return 'reply';
-        else if (this.obj.message) {
+        if (this.obj.message) {
             if (this.obj.message.text) return 'text';
             else if (this.obj.message.photo && !this.obj.message.sticker) return 'photo';
             else if (this.obj.message.sticker) return 'sticker';

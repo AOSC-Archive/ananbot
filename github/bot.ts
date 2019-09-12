@@ -42,9 +42,14 @@ export class GithubBot {
     }
 
     public static async getRepoLabels(requester: AxiosInstance, repoURL: string): Promise<string[]> {
+        const res = [];
         const resp = await requester.get(`${repoURL}/labels`);
         if (resp.status !== 200 || resp.data === undefined) throw new Error('GET labels failed');
-        return GithubBot.getLabelListByIssue(resp.data);
+        const list = resp.data as GithubInterface.IssueLabel[];
+        for (const index of list) {
+            res.push(index.name);
+        }
+        return res;
     }
 
     public static getLabelListByIssue(issue: GithubInterface.IssueResponse): string[] {
@@ -109,7 +114,7 @@ export class GithubBot {
 }
 
 const create = async (): Promise<GithubBot> => {
-    return await GithubBot.createGithubBot(readLoginInfo(), 'eatradish', 'saki-telebot-api');
+    return await GithubBot.createGithubBot(readLoginInfo(), 'aosc-dev', 'aosc-os-abbs');
 }
 
 export default create;
