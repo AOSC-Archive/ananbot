@@ -60,6 +60,9 @@ export class GithubBot {
         if (res.status === 200 && res.data) return res.data;
         else throw new Error('GET close issue failed');
     }
+    public getIssueNUmber(issue: GithubInterface.IssueResponse) {
+        return issue.number;
+    }
     public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest): Promise<GithubInterface.IssueResponse> {
         const json = JSON.stringify(issue);
         const res = await this.requester.post(this.issueURL, json);
@@ -76,7 +79,7 @@ export class GithubBot {
 }
 
 const create = async (): Promise<GithubBot> => {
-    return await GithubBot.createGithubBot(readLoginInfo(), 'aosc-dev', 'aosc-os-abbs');
+    return await GithubBot.createGithubBot(readLoginInfo(), 'eatradish', 'saki-telebot-api');
 }
 
 export default create;
