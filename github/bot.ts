@@ -65,6 +65,10 @@ export class GithubBot {
         return res;
     }
 
+    public static getIssueNumber(issue: GithubInterface.IssueResponse): number {
+        return issue.number;
+    }
+
     public async getInfo(): Promise<GithubInterface.LoginResponse> {
         const res = await this.requester.get('');
         if (res.status === 200 && res.data) return res.data;
@@ -83,10 +87,6 @@ export class GithubBot {
         });
         if (res.status === 200 && res.data) return res.data;
         else throw new Error('GET close issue failed');
-    }
-
-    public getIssueNumber(issue: GithubInterface.IssueResponse): number {
-        return issue.number;
     }
 
     public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest): Promise<GithubInterface.IssueResponse> {
