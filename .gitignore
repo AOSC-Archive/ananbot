@@ -5,5 +5,5 @@ data/
 settings.ts
 tslint.json
 yarn-error.log
-login.json
+github.json
 telegram_token.json

@@ -3,9 +3,9 @@ import Axios, { AxiosInstance } from 'axios';
 import * as GithubInterface from './GithubInterface';
 import axiosRetry from 'axios-retry';
 
-export function readLoginInfo(path = './login.json'): GithubInterface.LoginRequest {
+export function readSettings(path = './github.json'): GithubInterface.Config {
     const file = Fs.readFileSync(path, 'utf8');
-    if (file) return JSON.parse(file) as GithubInterface.LoginRequest;
+    if (file) return JSON.parse(file) as GithubInterface.Config;
     else throw new Error('File not exist');
 }
 
@@ -27,12 +27,16 @@ export class GithubBot {
         axiosRetry(this.requester, { retries: 3 });
     }
 
-    public static async createGithubBot(login: GithubInterface.LoginRequest, owner: string, repo: string): 
-    Promise<GithubBot> {
+    public static async createGithubBot(config: GithubInterface.Config): Promise<GithubBot> {
         const requester = Axios.create({
             baseURL: "https://api.github.com",
-            auth: login,
+            auth: { 
+                username: config.username,
+                password: config.password
+            }
         });
+        const owner = config.owner;
+        const repo = config.repo;
         const repoURL = `/repos/${owner}/${repo}`;
         const labelList = await GithubBot.getRepoLabels(requester, repoURL);
         const obj = {
@@ -114,7 +118,7 @@ export class GithubBot {
 }
 
 const create = async (): Promise<GithubBot> => {
-    return await GithubBot.createGithubBot(readLoginInfo(), 'aosc-dev', 'aosc-os-abbs');
+    return await GithubBot.createGithubBot(readSettings());
 }
 
 export default create;

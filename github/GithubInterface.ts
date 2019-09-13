@@ -5,6 +5,12 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface Config {
+    username: string;
+    password: string;
+    owner: string;
+    repo: string;
+}
 export interface IssueResponse {
     url: string;
     repository_url: string;
