@@ -17,8 +17,8 @@ const main = async (): Promise<void> => {
     const teleramBot = createTelegramBot();
 
     teleramBot.on('/hello', (msg: Messages.default) => msg.replyText('Hello'));
+    
     teleramBot.on('/openissue', async (msg: Messages.default, props: string[]) => {
-        if (msg.obj.message) console.log(msg.obj.message.chat)
         if ((msg.obj.message && !msg.obj.message.reply_to_message) || !msg.obj.message || !msg.obj.message.text) {
             msg.replyText('Use: Reply some message /openissue + title');
             return;
