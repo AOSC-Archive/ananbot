@@ -1,55 +1,39 @@
-import TelegramBot from './telegram/api/bot';
-import * as Messages from './telegram/api/message';
+import TelegramBot, { readClientInfo } from './telegram/bot';
 import GithubBot from './github/bot';
-import Fs from 'fs';
+import * as TDLTypes from 'tdl/types/tdlib';
 
-const createTelegramBot = (): TelegramBot => {
-    let token;
-    const telegramBotTokenFile = Fs.readFileSync('./telegram_token.json', 'utf8');
-    const telegramBotTokenFileJson = JSON.parse(telegramBotTokenFile);
-    if (telegramBotTokenFileJson && telegramBotTokenFileJson.token) token = telegramBotTokenFileJson.token;
-    const telegramBot = new TelegramBot(token);
+const createTelegramBot = async (): Promise<TelegramBot> => {
+    const info = readClientInfo('./telegram.json');
+    const telegramBot = await TelegramBot.init(info.apiId, info.apiHash);
     return telegramBot;
 }
 
 const main = async (): Promise<void> => {
     const githubBot = await GithubBot();
-    const teleramBot = createTelegramBot();
-
-    teleramBot.on('/hello', (msg: Messages.default) => msg.replyText('Hello'));
-    
-    teleramBot.on('/openissue', async (msg: Messages.default, props: string[]) => {
-        if ((msg.obj.message && !msg.obj.message.reply_to_message) || !msg.obj.message || !msg.obj.message.text) {
-            msg.replyText('Use: Reply some message /openissue + title');
-            return;
+    const telegramBot = await createTelegramBot();
+    telegramBot.on('/hello', (message: TDLTypes.message) => telegramBot.sendMessage(message.chat_id, 'Hello!'));
+    telegramBot.on('/openissue', async (message: TDLTypes.message, argument: string[]) => {
+        if (message.reply_to_message_id !== 0 && argument.length !== 0) {
+            const rep = await telegramBot.getRepliedMessage(message.chat_id, message.id);
+            if (rep.content._ !== 'messageText') return;
+            const res = await githubBot.openNewIssue({
+                title: argument[0],
+                body: rep.content.text.text,
+            });
+            telegramBot.sendMessage(message.chat_id, `Open issue #${res.number} success!`);
         }
-        if (!msg.obj.message.reply_to_message) return;
-        const title = props[1];
-        const body = msg.obj.message.reply_to_message.text;
-        const issue = { title, body };
-        const res = await githubBot.openNewIssue(issue);
-        if (res) msg.replyText(`Open issue success, issue number: ${res.number}`);
     });
-
-    teleramBot.on('/closeissue', async (msg: Messages.default, props: string[]) => {
-        let issue= -1;
-        if (Number(props[1]) !== NaN) {
-            issue = Number(props[1])
+    telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string[]) => {
+        const issueNumberStr = argument[0];
+        const issueNumber = Number(issueNumberStr.replace('#', ''));
+        if (issueNumber !== NaN) {
+            const res = await githubBot.closeIssue(issueNumber);
+            if (res.state === 'closed') {
+               return await telegramBot.sendMessage(message.chat_id, `Close issue #${issueNumber} success!`);
+            }
         }
-        else if (props[1].indexOf('github.com') !== -1) {
-            const parseList = props[1].split('/');
-            if (Number(parseList[parseList.length - 1]) !== NaN) issue = Number(parseList[parseList.length - 1]);
-        }
-        else if (props[1][0] === '#') {
-            const toNumber = props[1].replace('#', '');
-            if (Number(toNumber) !== NaN) issue = Number(toNumber);
-        }
-        if (issue === -1) throw new Error('arg Error');
-        const res = await githubBot.closeIssue(issue);
-        if (res) msg.replyText(`Close issue success, issue number: ${res.number}`);
     });
-    
-    teleramBot.listen();
+    telegramBot.listen();
 }
 
 main();

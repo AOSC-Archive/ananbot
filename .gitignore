@@ -2,8 +2,9 @@ node_modules/
 dist/
 data/
 .vscode/
-settings.ts
+_td_database/
+_td_files/
 tslint.json
 yarn-error.log
 github.json
-telegram_token.json
+telegram.json
