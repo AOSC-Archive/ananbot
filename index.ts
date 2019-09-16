@@ -26,11 +26,16 @@ const main = async (): Promise<void> => {
     telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string[]) => {
         const issueNumberStr = argument[0];
         const issueNumber = Number(issueNumberStr.replace('#', ''));
-        if (issueNumber !== NaN) {
-            const res = await githubBot.closeIssue(issueNumber);
-            if (res.state === 'closed') {
-               return await telegramBot.sendMessage(message.chat_id, `Close issue #${issueNumber} success!`);
-            }
+        if (issueNumber === NaN) {
+            return await telegramBot.sendMessage(message.chat_id, 'Usege: /closeissue + issue number');
+        }
+        const issue = await githubBot.getIssueByNumber(issueNumber);
+        if (issue.state === 'closed') {
+            return await telegramBot.sendMessage(message.chat_id, `Issue #${issueNumber} already close`);
+        }
+        const res = await githubBot.closeIssue(issueNumber);
+        if (res.state === 'closed') {
+            return await telegramBot.sendMessage(message.chat_id, `Close issue #${issueNumber} success!`);
         }
     });
     telegramBot.listen();
