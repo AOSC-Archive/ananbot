@@ -46,7 +46,8 @@ export default class TelegramBot extends EventEmitter {
     public async getRepliedMessage(chatId: number, MessageId: number): Promise<TDLTypes.message> {
         return await this.client.invoke({ _: 'getRepliedMessage', chat_id: chatId, message_id: MessageId });
     }
-    private async parseTextEntities(text: string, parseMode: TDLTypes.textParseModeMarkdown):
+
+    private async parseTextEntities(text: string, parseMode: TDLTypes.TextParseMode$Input):
         Promise<TDLTypes.formattedText> {
         const res = await this.client.invoke({
             _: 'parseTextEntities',
@@ -55,6 +56,7 @@ export default class TelegramBot extends EventEmitter {
         });
         return res;
     }
+
     public async listen(): Promise<void> {
         this.client.on('update', async (update) => {
             if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {

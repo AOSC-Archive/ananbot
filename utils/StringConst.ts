@@ -16,7 +16,7 @@ export function closeIssueSuccessfully(issueNumber: number, url: string): string
 
 export function openissueBody(text: string, author?: string): string {
     if (!author) {
-        return '##Description\n\n' +
+        return '## Description\n\n' +
             `${text}\n\n`;
     }
     else {
