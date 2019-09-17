@@ -1,17 +1,14 @@
-import { Client } from 'tdl';
+import { Client, StrictConfigType } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
 import Fs from 'fs';
-import * as TelegramInterface from './TelegramInterface';
 import * as TDLTypes from 'tdl/types/tdlib';
 import { EventEmitter } from 'events';
 
-export function readClientInfo(path: string | URL): TelegramInterface.ClientInfo {
+export function readClientInfo(path: string | URL): StrictConfigType {
     const clientInfoFile = Fs.readFileSync(path, 'utf8');
     if (!clientInfoFile) throw new Error('Telegram Client config file not exist');
-    const clientInfo = JSON.parse(clientInfoFile) as TelegramInterface.ClientInfo;
-    console.log(clientInfo);
-    if (clientInfo.apiId && clientInfo.apiHash) return clientInfo;
-    else throw new Error('Telegram client type error');
+    const clientInfo = JSON.parse(clientInfoFile) as StrictConfigType;
+    return clientInfo;
 }
 
 export default class TelegramBot extends EventEmitter {
