@@ -22,7 +22,7 @@ export default class TelegramBot extends EventEmitter {
         this.client = client;
         this.myChatId = myChatId;
     }
-    
+
     public static async init(apiId: number, apiHash: string): Promise<TelegramBot> {
         const client = new Client(new TDLib(), { apiId, apiHash });
         await client.connectAndLogin();
@@ -46,7 +46,15 @@ export default class TelegramBot extends EventEmitter {
     public async getRepliedMessage(chatId: number, MessageId: number): Promise<TDLTypes.message> {
         return await this.client.invoke({ _: 'getRepliedMessage', chat_id: chatId, message_id: MessageId });
     }
-
+    private async parseTextEntities(text: string, parseMode: TDLTypes.textParseModeMarkdown):
+        Promise<TDLTypes.formattedText> {
+        const res = await this.client.invoke({
+            _: 'parseTextEntities',
+            text,
+            parse_mode: parseMode,
+        });
+        return res;
+    }
     public async listen(): Promise<void> {
         this.client.on('update', async (update) => {
             if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {
@@ -66,15 +74,13 @@ export default class TelegramBot extends EventEmitter {
     }
 
     public async sendMessage(id: number, msg: string): Promise<TDLTypes.message> {
+        const formatText = await this.parseTextEntities(msg,  { _: "textParseModeMarkdown" });
         const res = await this.client.invoke({
             _: 'sendMessage',
             chat_id: id,
             input_message_content: {
                 _: 'inputMessageText',
-                text: {
-                    _: 'formattedText',
-                    text: msg,
-                }
+                text: formatText,
             }
         });
         return res;

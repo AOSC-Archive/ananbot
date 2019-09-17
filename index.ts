@@ -30,7 +30,7 @@ const main = async (): Promise<void> => {
             title: argument[0],
             body: StringConst.openissueBody(rep.content.text.text, username),
         });
-        return await telegramBot.sendMessage(message.chat_id, StringConst.OpenissueSuccessfully(res.number));
+        return await telegramBot.sendMessage(message.chat_id, StringConst.OpenissueSuccessfully(res.number, res.html_url));
     });
 
     telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string[]) => {
@@ -50,7 +50,7 @@ const main = async (): Promise<void> => {
         const res = await githubBot.closeIssue(issueNumber);
         if (res.state === 'closed') {
             return await telegramBot.sendMessage(message.chat_id,
-                StringConst.closeIssueSuccessfully(res.number));
+                StringConst.closeIssueSuccessfully(res.number, res.html_url));
         }
     });
 
