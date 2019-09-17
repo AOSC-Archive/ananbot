@@ -27,10 +27,11 @@ const main = async (): Promise<void> => {
         }
         const username = (await telegramBot.getUserById(message.chat_id)).username;
         const res = await githubBot.openNewIssue({
-            title: argument[0],
+            title: argument.join(' '),
             body: StringConst.openissueBody(rep.content.text.text, username),
         });
-        return await telegramBot.sendMessage(message.chat_id, StringConst.OpenissueSuccessfully(res.number, res.html_url));
+        return await telegramBot.sendMessage(message.chat_id, 
+            StringConst.OpenissueSuccessfully(res.number, res.html_url));
     });
 
     telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string[]) => {
