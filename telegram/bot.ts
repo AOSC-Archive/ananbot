@@ -46,7 +46,7 @@ export default class TelegramBot extends EventEmitter {
                 const text = update.message.content.text.text;
                 if (sender === this.myChatId) return;
                 const command = text.split(' ')[0];
-                const argument = text.split(' ').slice(1).join(' ');
+                const argument = text.split(' ').slice(1);
                 if (this.eventNames().indexOf(command) !== -1) {
                     return this.excute(update.message, command, argument);
                 }
@@ -70,7 +70,7 @@ export default class TelegramBot extends EventEmitter {
         return res;
     }
 
-    public excute(message: TDLTypes.message, command: string, argument: string): boolean {
+    public excute(message: TDLTypes.message, command: string, argument: string[]): boolean {
         const fn = (this.listeners(command))[0];
         return this.emit(command, fn(message, argument));
     }
