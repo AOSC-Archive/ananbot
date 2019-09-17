@@ -1,7 +1,8 @@
 import TelegramBot, { readClientInfo } from './telegram/bot';
 import GithubBot from './github/bot';
 import * as TDLTypes from 'tdl/types/tdlib';
-import * as StringConst from './StringConst';
+import * as StringConst from './utils/StringConst';
+import * as Tools from './utils/tools';
 
 const createTelegramBot = async (): Promise<TelegramBot> => {
     const info = readClientInfo('./telegram.json');
@@ -12,7 +13,9 @@ const createTelegramBot = async (): Promise<TelegramBot> => {
 const main = async (): Promise<void> => {
     const githubBot = await GithubBot();
     const telegramBot = await createTelegramBot();
+
     telegramBot.on('/hello', (message: TDLTypes.message) => telegramBot.sendMessage(message.chat_id, 'Hello!'));
+
     telegramBot.on('/openissue', async (message: TDLTypes.message, argument: string[]) => {
         if (message.reply_to_message_id === 0) {
             return telegramBot.sendMessage(message.chat_id, StringConst.OpenissueFail);
@@ -25,18 +28,18 @@ const main = async (): Promise<void> => {
         }
         const res = await githubBot.openNewIssue({
             title: arg,
-            body: rep.content.text.text,
+            body: StringConst.openissueBody(rep.content.text.text, rep.author_signature),
         });
         return await telegramBot.sendMessage(message.chat_id, StringConst.OpenissueSuccessfully(res.number));
     });
+
     telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string[]) => {
         if (argument.length === 0) {
             return await telegramBot.sendMessage(message.chat_id, StringConst.CloseIssueFailUsege);
         }
-        const arg = argument.join(' ');
-        const issueNumberStr = arg;
-        const issueNumber = Number(issueNumberStr.replace('#', ''));
-        if (issueNumber === NaN) {
+        const issueNumberStr = argument[0];
+        const issueNumber = Tools.issueToNumber(issueNumberStr);
+        if (!issueNumber) {
             return await telegramBot.sendMessage(message.chat_id, StringConst.CloseIssueFailUsege);
         }
         const issue = await githubBot.getIssueByNumber(issueNumber);
@@ -50,6 +53,13 @@ const main = async (): Promise<void> => {
                 StringConst.closeIssueSuccessfully(res.number));
         }
     });
+
+    telegramBot.on('/replyandclose', async (message: TDLTypes.message, argument: string[]) => {
+        const issueNumber = Tools.issueToNumber(argument[0]);
+        const text = argument[1];
+        if (!issueNumber) return telegramBot.sendMessage(message.chat_id, StringConst.replyAndCloseIssueFail);
+    });
+
     telegramBot.listen();
 }
 

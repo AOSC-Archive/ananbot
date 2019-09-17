@@ -13,3 +13,8 @@ export function closeIssueFailIssueClosed(issueNumber: number): string {
 export function closeIssueSuccessfully(issueNumber: number): string {
     return `Open issue #${issueNumber} successfully`
 }
+
+export function openissueBody(text: string, author: string): string {
+    return `Issue:\n${text}\nOpen issue By: ${author} (from telegram)`;
+}
+export const replyAndCloseIssueFail = 'Usege: /replyandclose + issue number + reply text';
