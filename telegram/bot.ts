@@ -49,7 +49,10 @@ export default class TelegramBot extends EventEmitter {
 
     public async listen(): Promise<void> {
         this.client.on('update', async (update) => {
+            const date = Date.now() / 1000;
             if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {
+                if (date > update.message.date) return;
+                console.log(update.message);
                 const sender = update.message.sender_user_id;
                 const text = update.message.content.text.text;
                 if (sender === this.myChatId) return;

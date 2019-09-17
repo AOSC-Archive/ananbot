@@ -13,8 +13,8 @@ export class GithubBot {
     private requester: AxiosInstance;
     public owner: string;
     public repo: string;
-    private repoURL: string;
-    private issueURL: string;
+    public repoURL: string;
+    public issueURL: string;
     public labelList: string[];
 
     private constructor(obj: GithubInterface.OpenNewGithubBot) {
@@ -30,7 +30,7 @@ export class GithubBot {
     public static async createGithubBot(config: GithubInterface.Config): Promise<GithubBot> {
         const requester = Axios.create({
             baseURL: "https://api.github.com",
-            auth: { 
+            auth: {
                 username: config.username,
                 password: config.password
             }

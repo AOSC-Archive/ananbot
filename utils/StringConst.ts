@@ -14,10 +14,16 @@ export function closeIssueSuccessfully(issueNumber: number): string {
     return `Open issue #${issueNumber} successfully`
 }
 
-export function openissueBody(text: string, author: string): string {
-    return '##Description\n\n' +
-    `${text}\n\n` +
-    '##Open issue By \n\n' +
-    `${author} (from telegram)`;
+export function openissueBody(text: string, author?: string): string {
+    if (!author) {
+        return '##Description\n\n' +
+            `${text}\n\n`;
+    }
+    else {
+        return '## Description\n\n' +
+            `${text}\n\n` +
+            '## Open issue By \n\n' +
+            `${author} from telegram`;
+    }
 }
 export const replyAndCloseIssueFail = 'Usege: /replyandclose + issue number + reply text';
