@@ -49,12 +49,12 @@ export default class TelegramBot extends EventEmitter {
 
     public async listen(): Promise<void> {
         this.client.on('update', async (update) => {
-            const date = Date.now() / 1000;
             if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {
-                if (date > update.message.date) return;
                 const sender = update.message.sender_user_id;
-                const text = update.message.content.text.text;
                 if (sender === this.myChatId) return;
+                const date = Date.now() / 1000;
+                if (date - update.message.date > 5) return;
+                const text = update.message.content.text.text;
                 const command = text.split(' ')[0];
                 const argument = text.split(' ').slice(1);
                 if (this.eventNames().indexOf(command) !== -1) {
@@ -81,8 +81,7 @@ export default class TelegramBot extends EventEmitter {
     }
 
     public excute(message: TDLTypes.message, command: string, argument: string[]): boolean {
-        const fn = (this.listeners(command))[0];
-        return this.emit(command, fn(message, argument));
+        return this.emit(command, message, argument);
     }
 }
 
