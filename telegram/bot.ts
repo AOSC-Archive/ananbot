@@ -35,6 +35,14 @@ export default class TelegramBot extends EventEmitter {
         return me;
     }
 
+    public async getUserById(id: number): Promise<TDLTypes.User> {
+        const res = await this.client.invoke({
+            _: 'getUser',
+            user_id: id,
+        });
+        return res;
+    }
+
     public async getRepliedMessage(chatId: number, MessageId: number): Promise<TDLTypes.message> {
         return await this.client.invoke({ _: 'getRepliedMessage', chat_id: chatId, message_id: MessageId });
     }
