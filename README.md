@@ -26,7 +26,7 @@ Open issue bot from AOSC telegram group
 - use `npx ts-node index.ts` start bot.
 
 ## TODO
-- [ ]Readme
+- [ ] Readme
 - [ ] License
 - [ ] Worlfow
 - [ ] Github Open issue/comment issue Markdown support
