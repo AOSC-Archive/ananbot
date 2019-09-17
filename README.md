@@ -5,7 +5,7 @@ Open issue bot from AOSC telegram group
 - clone, build and install [td](https://github.com/tdlib/td)
 - install `nodejs` and `yarn`
 - clone this repo
-- cd ananbot and create `telegram.json` file, expample:
+- cd ananbot and create `telegram.json` file, example:
 ```
 {
     "apiId": //Telegram API ID,
