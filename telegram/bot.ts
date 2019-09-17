@@ -7,7 +7,7 @@ import { EventEmitter } from 'events';
 
 export function readClientInfo(path: string | URL): TelegramInterface.ClientInfo {
     const clientInfoFile = Fs.readFileSync(path, 'utf8');
-    if (!clientInfoFile) throw new Error('Telegram Client config File not exist');
+    if (!clientInfoFile) throw new Error('Telegram Client config file not exist');
     const clientInfo = JSON.parse(clientInfoFile) as TelegramInterface.ClientInfo;
     console.log(clientInfo);
     if (clientInfo.apiId && clientInfo.apiHash) return clientInfo;

@@ -6,6 +6,7 @@ import * as Tools from './utils/tools';
 
 const createTelegramBot = async (): Promise<TelegramBot> => {
     const info = readClientInfo('./telegram.json');
+    if (!info.apiId || !info.apiHash) throw new Error('Telegram client type error');
     const telegramBot = await TelegramBot.init(info.apiId, info.apiHash);
     return telegramBot;
 }
