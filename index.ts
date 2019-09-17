@@ -29,19 +29,25 @@ const main = async (): Promise<void> => {
         });
         return await telegramBot.sendMessage(message.chat_id, StringConst.OpenissueSuccessfully(res.number));
     });
-    telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string) => {
-        const issueNumberStr = argument;
+    telegramBot.on('/closeissue', async (message: TDLTypes.message, argument: string[]) => {
+        if (argument.length === 0) {
+            return await telegramBot.sendMessage(message.chat_id, StringConst.CloseIssueFailUsege);
+        }
+        const arg = argument.join(' ');
+        const issueNumberStr = arg;
         const issueNumber = Number(issueNumberStr.replace('#', ''));
         if (issueNumber === NaN) {
             return await telegramBot.sendMessage(message.chat_id, StringConst.CloseIssueFailUsege);
         }
         const issue = await githubBot.getIssueByNumber(issueNumber);
         if (issue.state === 'closed') {
-            return await telegramBot.sendMessage(message.chat_id, StringConst.closeIssueFailIssueClosed(issue.number));
+            return await telegramBot.sendMessage(message.chat_id, 
+                StringConst.closeIssueFailIssueClosed(issue.number));
         }
         const res = await githubBot.closeIssue(issueNumber);
         if (res.state === 'closed') {
-            return await telegramBot.sendMessage(message.chat_id, StringConst.closeIssueSuccessfully(res.number));
+            return await telegramBot.sendMessage(message.chat_id,
+                StringConst.closeIssueSuccessfully(res.number));
         }
     });
     telegramBot.listen();
