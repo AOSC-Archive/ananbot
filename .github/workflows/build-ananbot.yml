@@ -1,0 +1,30 @@
+name: Build ananbot
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
+
+    steps:
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Setup Yarn
+      run: npm install -g yarn
+    - name: Checkout Codes
+      uses: actions/checkout@master
+    - name: Setup build environment
+      run: yarn install
+    - name: Build ananbot
+      run: yarn build
