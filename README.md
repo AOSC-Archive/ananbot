@@ -29,4 +29,5 @@ Open issue bot from AOSC telegram group
 - [x] Readme
 - [ ] License (MIT?)
 - [x] Workfow
-- [ ] Github Open issue/comment issue Markdown support
+- [x] Github Open issue/comment issue Markdown support
+- [ ] replyAndCloseIssue
