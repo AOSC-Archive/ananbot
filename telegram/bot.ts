@@ -60,8 +60,12 @@ export default class TelegramBot extends EventEmitter {
             if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {
                 const sender = update.message.sender_user_id;
                 if (sender === this.myChatId) return;
+
+                //this Do not receive unread message
+                //But is there a better way?
                 const date = Date.now() / 1000;
-                if (date - update.message.date > 5) return;
+                if (date - update.message.date > 2) return;
+
                 const text = update.message.content.text.text;
                 const command = text.split(' ')[0];
                 const argument = text.split(' ').slice(1);
