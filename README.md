@@ -28,5 +28,5 @@ Open issue bot from AOSC telegram group
 ## TODO
 - [x] Readme
 - [ ] License (MIT?)
-- [x] Worlfow
+- [x] Workfow
 - [ ] Github Open issue/comment issue Markdown support
