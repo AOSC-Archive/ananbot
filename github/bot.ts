@@ -122,5 +122,3 @@ const create = async (): Promise<GithubBot> => {
 }
 
 export default create;
-
-
