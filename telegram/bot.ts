@@ -55,19 +55,12 @@ export default class TelegramBot extends EventEmitter {
     }
 
     public async listen(): Promise<void> {
-        const date = Date.now() / 1000;
         this.client.on('update', async (update) => {
-            if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {
+            if (update._ === 'updateNewMessage') {
+                await this.viewMessages(update.message.chat_id, [update.message.id], true);
+                if (update.message.content._ !== 'messageText') return;
                 const sender = update.message.sender_user_id;
                 if (sender === this.myChatId) return;
-
-                //this Do not receive unread message
-                //But is there a better way?
-                //这里为什么不是 if date > update.message.date: return 呢？
-                //因为你发送消息的时间总是小于客户端接收到消息的时间，它们存在一个很小的间隔
-                //这里设定限制为 2s
-                if (date - update.message.date > 1) return;
-
                 const text = update.message.content.text.text;
                 const command = text.split(' ')[0];
                 const argument = text.split(' ').slice(1);
@@ -80,7 +73,7 @@ export default class TelegramBot extends EventEmitter {
     }
 
     public async sendMessage(id: number, msg: string): Promise<TDLTypes.message> {
-        const formatText = await this.parseTextEntities(msg,  { _: "textParseModeMarkdown" });
+        const formatText = await this.parseTextEntities(msg, { _: "textParseModeMarkdown" });
         const res = await this.client.invoke({
             _: 'sendMessage',
             chat_id: id,
@@ -88,6 +81,16 @@ export default class TelegramBot extends EventEmitter {
                 _: 'inputMessageText',
                 text: formatText,
             }
+        });
+        return res;
+    }
+
+    public async viewMessages(chatId: number, messageIds: number[], forceRead: boolean): Promise<TDLTypes.ok> {
+        const res = await this.client.invoke({
+            _: 'viewMessages',
+            chat_id: chatId,
+            message_ids: messageIds,
+            force_read: forceRead,
         });
         return res;
     }
