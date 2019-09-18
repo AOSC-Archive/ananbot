@@ -44,7 +44,7 @@ export default class TelegramBot extends EventEmitter {
         return await this.client.invoke({ _: 'getRepliedMessage', chat_id: chatId, message_id: MessageId });
     }
 
-    private async parseTextEntities(text: string, parseMode: TDLTypes.TextParseMode$Input):
+    public async parseTextEntities(text: string, parseMode: TDLTypes.TextParseMode$Input):
         Promise<TDLTypes.formattedText> {
         const res = await this.client.invoke({
             _: 'parseTextEntities',
@@ -55,6 +55,7 @@ export default class TelegramBot extends EventEmitter {
     }
 
     public async listen(): Promise<void> {
+        const date = Date.now() / 1000;
         this.client.on('update', async (update) => {
             if (update._ === 'updateNewMessage' && update.message.content._ === 'messageText') {
                 const sender = update.message.sender_user_id;
@@ -62,8 +63,10 @@ export default class TelegramBot extends EventEmitter {
 
                 //this Do not receive unread message
                 //But is there a better way?
-                const date = Date.now() / 1000;
-                if (date - update.message.date > 2) return;
+                //这里为什么不是 if date > update.message.date: return 呢？
+                //因为你发送消息的时间总是小于客户端接收到消息的时间，它们存在一个很小的间隔
+                //这里设定限制为 2s
+                if (date - update.message.date > 1) return;
 
                 const text = update.message.content.text.text;
                 const command = text.split(' ')[0];
