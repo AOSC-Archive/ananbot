@@ -23,7 +23,8 @@ Open issue bot from AOSC telegram group
 
 ```
 - use `yarn` install dep
-- use `npx ts-node index.ts` start bot.
+- use `yarn build` build this bot.
+- use `yarn start` start this bot.
 
 ## TODO
 - [x] Readme
