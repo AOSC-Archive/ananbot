@@ -15,9 +15,9 @@ export class GithubBot {
     public owner: string;
     public repo: string;
     public repoURL: string;
-    public repoHtmlUrl = `https//github.com/${this.owner}/${this.repo}`;
-    public issueURL = `${this.repoURL}/issues`;
-    public issueHtmlUrl = `${this.repoHtmlUrl}/issues`;
+    public repoHtmlUrl: string;
+    public issueURL: string;
+    public issueHtmlUrl: string;
     public labelList: string[];
 
     private constructor(obj: GithubInterface.OpenNewGithubBot) {
@@ -27,6 +27,8 @@ export class GithubBot {
         this.repoURL = obj.repoURL;
         this.labelList = obj.labelList;
         this.issueURL = `${this.repoURL}/issues`;
+        this.repoHtmlUrl = `https://github.com/${this.owner}/${this.repo}`;
+        this.issueHtmlUrl = `${this.repoHtmlUrl}/issues`;
         axiosRetry(this.requester, { retries: 3 });
     }
 
@@ -95,7 +97,10 @@ export class GithubBot {
     public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest): Promise<GithubInterface.IssueResponse> {
         const json = JSON.stringify(issue);
         const res = await this.requester.post(this.issueURL, json);
-        if (res.status === 201 && res.data) return res.data;
+        if (res.status === 201 && res.data) {
+            console.log(res.data);
+            return res.data;
+        }
         else throw new Error('POST open new issue failed');
     }
 
