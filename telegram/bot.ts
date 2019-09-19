@@ -91,7 +91,7 @@ export default class TelegramBot extends EventEmitter {
         return res;
     }
 
-    public async viewMessages(chatId: number, messageIds: number[], forceRead: boolean): Promise<TDLTypes.ok> {
+    private async viewMessages(chatId: number, messageIds: number[], forceRead: boolean): Promise<TDLTypes.ok> {
         const res = await this.client.invoke({
             _: 'viewMessages',
             chat_id: chatId,
@@ -101,7 +101,7 @@ export default class TelegramBot extends EventEmitter {
         return res;
     }
 
-    public excute(message: TDLTypes.message, command: string, argument: string[]): boolean {
+    private excute(message: TDLTypes.message, command: string, argument: string[]): boolean {
         return this.emit(command, message, argument);
     }
 }
