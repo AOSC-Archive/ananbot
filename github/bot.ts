@@ -97,10 +97,7 @@ export class GithubBot {
     public async openNewIssue(issue: GithubInterface.OpenNewIssueRequest): Promise<GithubInterface.IssueResponse> {
         const json = JSON.stringify(issue);
         const res = await this.requester.post(this.issueURL, json);
-        if (res.status === 201 && res.data) {
-            console.log(res.data);
-            return res.data;
-        }
+        if (res.status === 201 && res.data) return res.data;
         else throw new Error('POST open new issue failed');
     }
 
