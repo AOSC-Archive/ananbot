@@ -23,12 +23,12 @@ export default class TelegramBot extends EventEmitter {
     public static async init(apiId: number, apiHash: string): Promise<TelegramBot> {
         const client = new Client(new TDLib(), { apiId, apiHash });
         await client.connectAndLogin();
-        const myChatId = (await client.invoke({ _: 'getMe' })).id;
+        const myChatId = (await TelegramBot.getMe(client)).id;
         return new TelegramBot(client, myChatId);
     }
 
-    public async getMe(): Promise<{} | null> {
-        const me = await this.client.invoke({ _: 'getMe' });
+    public static async getMe(client: Client): Promise<TDLTypes.User> {
+        const me = await client.invoke({ _: 'getMe' });
         return me;
     }
 
