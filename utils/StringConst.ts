@@ -6,6 +6,10 @@ export function OpenissueSuccessfully(issueNumber: number, url: string): string 
 
 export const CloseIssueFailUsege = 'Usege: /closeissue + number or # + number';
 
+export function issueAlreadyClosed(issueNumber: number, url: string): string {
+    return `Issue [#${issueNumber}](${url}) Already closed.`
+}
+
 export function closeIssueFailIssueClosed(issueNumber: number): string {
     return `Issue ${issueNumber} has been closed`;
 }

@@ -2,6 +2,7 @@ import Fs from 'fs';
 import Axios, { AxiosInstance } from 'axios';
 import * as GithubInterface from './GithubInterface';
 import axiosRetry from 'axios-retry';
+import * as StringConst from '../utils/StringConst';
 
 export function readSettings(path = './github.json'): GithubInterface.Config {
     const file = Fs.readFileSync(path, 'utf8');
@@ -14,7 +15,9 @@ export class GithubBot {
     public owner: string;
     public repo: string;
     public repoURL: string;
-    public issueURL: string;
+    public repoHtmlUrl = `https//github.com/${this.owner}/${this.repo}`;
+    public issueURL = `${this.repoURL}/issues`;
+    public issueHtmlUrl = `${this.repoHtmlUrl}/issues`;
     public labelList: string[];
 
     private constructor(obj: GithubInterface.OpenNewGithubBot) {
@@ -104,6 +107,13 @@ export class GithubBot {
         else throw new Error(`PATCH close ${issueNumber} failed`);
     }
 
+    public async checkAndCloseIssue(issueNumber: number): Promise<GithubInterface.IssueResponse> {
+        const issue = await this.getIssueByNumber(issueNumber);
+        if (issue.state === 'closed') throw new Error(StringConst.issueAlreadyClosed(issueNumber, 
+            `${this.issueHtmlUrl}/${issueNumber}`));
+        return await this.closeIssue(issueNumber);
+    }
+
     public async addLabelByIssue(issueNumber: number, label: string): Promise<GithubInterface.IssueResponse> {
         if (this.labelList.indexOf(label) === -1) throw new Error('label not exist');
         const issue = await this.getIssueByNumber(issueNumber);
@@ -114,7 +124,15 @@ export class GithubBot {
         const resp = await this.requester.patch(this.issueURL, json);
         if (resp.status === 200 && resp.data) return resp.data;
         else throw new Error('PATCH addIabelByIssue failed');
-    }   
+    }
+
+    public async createNewIssueComment(issueNumber: number, text: string): Promise<GithubInterface.IssueResponse> {
+        const resp = await this.requester.post(`${this.issueURL}/${issueNumber}/comments`, JSON.stringify({
+            body: text,
+        }));
+        if (resp.status === 200 && resp.data) return resp.data;
+        else throw new Error('POST createNewIssueComment failed');
+    }
 }
 
 const create = async (): Promise<GithubBot> => {

@@ -31,7 +31,7 @@ const main = async (): Promise<void> => {
             title: argument.join(' '),
             body: StringConst.openissueBody(rep.content.text.text, username),
         });
-        return await telegramBot.sendMessage(message.chat_id, 
+        return await telegramBot.sendMessage(message.chat_id,
             StringConst.OpenissueSuccessfully(res.number, res.html_url));
     });
 
@@ -44,15 +44,12 @@ const main = async (): Promise<void> => {
         if (!issueNumber) {
             return await telegramBot.sendMessage(message.chat_id, StringConst.CloseIssueFailUsege);
         }
-        const issue = await githubBot.getIssueByNumber(issueNumber);
-        if (issue.state === 'closed') {
-            return await telegramBot.sendMessage(message.chat_id, 
-                StringConst.closeIssueFailIssueClosed(issue.number));
-        }
-        const res = await githubBot.closeIssue(issueNumber);
-        if (res.state === 'closed') {
-            return await telegramBot.sendMessage(message.chat_id,
-                StringConst.closeIssueSuccessfully(res.number, res.html_url));
+        try {
+            const res = await githubBot.checkAndCloseIssue(issueNumber);
+            return await telegramBot.sendMessage(message.chat_id, StringConst.closeIssueSuccessfully(issueNumber, 
+                res.html_url));
+        } catch (err) {
+            return await telegramBot.sendMessage(message.chat_id, err.message);
         }
     });
 
@@ -60,6 +57,8 @@ const main = async (): Promise<void> => {
         const issueNumber = Tools.issueToNumber(argument[0]);
         const text = argument[1];
         if (!issueNumber) return telegramBot.sendMessage(message.chat_id, StringConst.replyAndCloseIssueFail);
+        await githubBot.createNewIssueComment(issueNumber, text);
+        await githubBot.checkAndCloseIssue(issueNumber);
     });
 
     telegramBot.listen();
