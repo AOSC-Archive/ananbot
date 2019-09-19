@@ -54,9 +54,15 @@ export default class TelegramBot extends EventEmitter {
         return res;
     }
 
+    public async setBio(bio: string): Promise<TDLTypes.ok> {
+        return await this.client.invoke({ _: 'setBio', bio });
+    }
+
     public async listen(): Promise<void> {
+        const date = Math.floor(Date.now() / 1000);
         this.client.on('update', async (update) => {
             if (update._ === 'updateNewMessage') {
+                if (date - update.message.date > 0) return;
                 await this.viewMessages(update.message.chat_id, [update.message.id], true);
                 if (update.message.content._ !== 'messageText') return;
                 const sender = update.message.sender_user_id;
