@@ -3,6 +3,7 @@ import GithubBot from './github/bot';
 import * as TDLTypes from 'tdl/types/tdlib';
 import * as StringConst from './utils/StringConst';
 import * as Tools from './utils/tools';
+import webhookOAuth from './github/oauth';
 
 const createTelegramBot = async (): Promise<TelegramBot> => {
     const info = readClientInfo('./telegram.json');
@@ -12,6 +13,7 @@ const createTelegramBot = async (): Promise<TelegramBot> => {
 }
 
 const main = async (): Promise<void> => {
+    webhookOAuth();
     const githubBot = await GithubBot();
     const telegramBot = await createTelegramBot();
 

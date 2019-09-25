@@ -12,8 +12,9 @@ export interface LoginRequest {
 }
 
 export interface Config {
-    username: string;
-    password: string;
+    username?: string;
+    password?: string;
+    webhookUrl?: string;
     owner: string;
     repo: string;
 }
