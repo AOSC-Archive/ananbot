@@ -1,5 +1,11 @@
 import { AxiosInstance } from 'axios';
 
+export interface OAuthResponse {
+    clientId: number;
+    ClientSecret: number;
+    code: number;
+}
+
 export interface LoginRequest {
     username: string;
     password: string;
