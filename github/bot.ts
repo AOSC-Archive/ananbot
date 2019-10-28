@@ -32,38 +32,14 @@ export class GithubBot {
         axiosRetry(this.requester, { retries: 3 });
     }
 
-    
-
     public static async createGithubBot(config: GithubInterface.Config): Promise<GithubBot> {
-        let auth, headers;
-        let requester: AxiosInstance;
-        if (config.username && config.password) {
-            auth = {
+        const requester = Axios.create({
+            baseURL: "https://api.github.com",
+            auth: {
                 username: config.username,
-                password: config.password,
-            };
-            requester = Axios.create({
-                baseURL: "https://api.github.com",
-                auth,
-            });
-        }
-        else if (config.webhookUrl){
-            const resp = await Axios.get(config.webhookUrl);
-            let accessToken: string;
-            if (resp.status == 200 && resp.data && resp.data.access_token) {
-                accessToken = resp.data.access_token;
-                headers = {
-                    accept: 'application/json',
-                    Authorization: `token ${accessToken}`,
-                }
-                requester = Axios.create({
-                    baseURL: "https://api.github.com",
-                    headers,
-                });
+                password: config.password
             }
-            else throw resp.data;
-        }
-        else throw new Error('No Config.')
+        });
         const owner = config.owner;
         const repo = config.repo;
         const repoURL = `/repos/${owner}/${repo}`;
