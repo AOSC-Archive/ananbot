@@ -26,7 +26,7 @@ export function openissueBody(text: string, author?: string): string {
     else {
         return '## Description\n\n' +
             `${text}\n\n` +
-            '## Open issue By \n\n' +
+            '##  issue was opened by \n\n' +
             `${author} from telegram`;
     }
 }
