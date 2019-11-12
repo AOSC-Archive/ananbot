@@ -26,7 +26,9 @@ const main = async (): Promise<void> => {
         if (rep.content._ !== 'messageText') {
             return telegramBot.sendMessage(message.chat_id, StringConst.OpenissueFail);
         }
-        const username = (await telegramBot.getUserById(message.chat_id)).username;
+        let username = '';
+        const user = await telegramBot.getUserById(message.chat_id);
+        if (user.username) username = user.username;  
         const res = await githubBot.openNewIssue({
             title: argument.join(' '),
             body: StringConst.openissueBody(rep.content.text.text, username),
